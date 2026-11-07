@@ -1,0 +1,45 @@
+on:
+  push:
+    branches: main
+  pull_request:
+
+jobs:
+  Luacheck:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: lunarmodules/luacheck@cc089e3f65acdd1ef8716cc73a3eca24a6b845e4 # v1.2.0
+
+  Test:
+    runs-on: ubuntu-26.04
+    strategy:
+      matrix:
+        lua-version: [ "5.5", "5.4", "5.3", "5.2", "5.1", "luajit"]
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: luarocks/gh-actions-lua@56eba09993704b908cc3c7c2753e630d18cb9696 # v14
+        with:
+          luaVersion: ${{ matrix.lua-version }}
+
+      - uses: luarocks/gh-actions-luarocks@95d2308a0aff36ad31ebadca493ed14853399842 # v7
+
+      - name: Install
+        run: luarocks make
+
+      - name: Install test dependencies
+        run: |
+          luarocks install busted
+          luarocks install cluacov
+
+      - name: Busted
+        run:  busted --coverage
+
+      - name: Generate Lua coverage report
+        run: luacov
+
+      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

@@ -16,7 +16,8 @@
       "extensions": [
         "EditorConfig.EditorConfig",
         "sumneko.lua",
-        "dwenegar.vscode-luacheck"
+        "dwenegar.vscode-luacheck",
+        "github.vscode-github-actions"
       ]
     }
   }
